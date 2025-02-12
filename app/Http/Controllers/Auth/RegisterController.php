@@ -54,6 +54,7 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'alamat' => ['required', 'string'],
             'tanggallahir' => ['required', 'date'],
+            'no_hp' => ['required', 'string'],
             'jeniskelamin' => ['required', 'string'],
         ]);
     }
@@ -74,6 +75,7 @@ class RegisterController extends Controller
             'alamat' => $data['alamat'],
             'tanggallahir' => $data['tanggallahir'],
             'jeniskelamin' => $data['jeniskelamin'],
+            'no_hp' => $data['no_hp'],
             'foto' => 'default.jpg',
             'folder' => 'assets/img/user/default.jpg',
         ]);    }

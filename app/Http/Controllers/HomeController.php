@@ -62,7 +62,7 @@ class HomeController extends Controller
             ->where('status', 'Belum Dikirim')
             ->count();
 
-        return view('admin.beranda', compact('totalPembayaranSuksesHariIni', 'totalUsers', 'jumlahpesananharini','jumlahbelumdikrim'));
+        return view('admin.Beranda', compact('totalPembayaranSuksesHariIni', 'totalUsers', 'jumlahpesananharini','jumlahbelumdikrim'));
     }
 
     public function Profile()

@@ -10,16 +10,36 @@
                     <h6 class="m-0 font-weight-bold text-primary">Pakan Ikan</h6>
                 </div>
                 <!-- Card Body -->
-                <div class="card-body">
-                    <div class="text-center">
-                        <h1 class="h4 text-gray-900 mb-4">Kontrol Pemberi Pakan Ikan</h1>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col-lg-6">
-                            <div class="p-5">
-                                <div class="text-center">
-                                    <button id="feedBtn" class="btn btn-primary btn-block">Beri Makan Ikan</button>
-                                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">Pakan Ikan</div>
+
+                            <div class="card-body">
+                                @if (session('success'))
+                                    <div class="alert alert-success" role="alert">
+                                        {{ session('success') }}
+                                    </div>
+                                @endif
+
+                                <h4>Informasi Pakan Ikan</h4>
+                                <p>Waktu Pakan: {{ $waktuPakan }} detik</p>
+                                <p>Waktu Pemberian Pakan Terakhir:
+                                    {{ $last_feed_time ?? 'Belum ada data pemberian pakan.' }}</p>
+
+                                <hr>
+
+                                <h4>Update Waktu Pakan</h4>
+                                <form method="POST" action="{{ route('update.waktu.pakan') }}">
+                                    @csrf
+                                    <div class="form-group">
+                                        <label for="waktu_pakan">Waktu Pakan (detik)</label>
+                                        <input type="number" class="form-control" id="waktu_pakan" name="waktu_pakan"
+                                            value="{{('waktu_pakan') }}" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -27,29 +47,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.getElementById('feedBtn').addEventListener('click', function() {
-            fetch('{{ route('kasihmakan') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log(data.message); // Pesan sukses dari server
-                // Tambahkan logika lain jika perlu
-            })
-            .catch(error => {
-                console.error('There has been a problem with your fetch operation:', error);
-            });
-        });
-    </script>
+    </div>
 @endsection

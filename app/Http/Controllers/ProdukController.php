@@ -51,7 +51,7 @@ class ProdukController extends Controller
         $jenisproduk = JenisProduk::all();
 
         // Kirim data ke view
-        return view('admin.produk', compact('produk', 'jenisproduk'));
+        return view('admin.Produk', compact('produk', 'jenisproduk'));
     }
 
 
@@ -194,7 +194,7 @@ class ProdukController extends Controller
     public function formjenisproduk(Request $request)
     {
         $jenisproduk = jenisproduk::all();
-        return view('admin.jenisikan', compact('jenisproduk'));
+        return view('admin.Jenisikan', compact('jenisproduk'));
     }
 
     public function admintambahjenis(Request $request)

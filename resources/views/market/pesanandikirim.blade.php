@@ -31,9 +31,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($pengirimanList as $no => $kirim )
+                            @foreach ($pengirimanList as $no => $kirim)
                                 <tr>
-                                    <td>{{$no + 1}}</td>
+                                    <td>{{ $no + 1 }}</td>
                                     <td>{{ $kirim->id_pesanan }}</td>
                                     <td>{{ $kirim->tanggal_pengiriman }}</td>
                                     <td>{{ $kirim->status }}</td>
@@ -44,17 +44,13 @@
                                         </button>
                                     </td>
                                     <td>
-                                        @if ($kirim->status == 'Dikirim')
-                                            <form action="{{ route('terimaPengiriman', ['id' => $kirim->id_pengiriman]) }}"
-                                                method="POST">
-                                                @csrf
-                                                <button type="submit" class="btn btn-success">
-                                                    Diterima
-                                                </button>
-                                            </form>
-                                        @else
-                                            <span class="badge badge-success">Diterima</span>
-                                        @endif
+                                        <form action="{{ route('terimaPengiriman', ['id' => $kirim->id_pengiriman]) }}"
+                                            method="POST">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success">
+                                                Diterima
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
@@ -66,63 +62,46 @@
     </div>
 
     <!-- Modal Detail Pesanan -->
-    <div class="modal fade" id="detailPesananModal{{ $kirim->id_pengiriman }}" tabindex="-1" role="dialog"
-        aria-labelledby="detailPesananModalLabel{{ $kirim->id_pengiriman }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailPesananModalLabel{{ $kirim->id_pengiriman }}">Detail Pesanan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Nama Produk</th>
-                                <th>Jumlah</th>
-                                <th>Harga Satuan</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($kirim->detailPesanan as $detail)
+    @foreach ($pengirimanList as $kirim)
+        <div class="modal fade" id="detailPesananModal{{ $kirim->id_pengiriman }}" tabindex="-1" role="dialog"
+            aria-labelledby="detailPesananModalLabel{{ $kirim->id_pengiriman }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailPesananModalLabel{{ $kirim->id_pengiriman }}">Detail Pesanan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td>{{ $detail->nama_produk }}</td>
-                                    <td>{{ $detail->qty }}</td>
-                                    <td>Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
-                                    <td>Rp {{ number_format($detail->qty * $detail->harga_satuan, 0, ',', '.') }}</td>
-                                    @php
-                                    $totalHargaSemuaPesanan += $qty->total_harga;
-                                @endphp
+                                    <th>Nama Produk</th>
+                                    <th>Jumlah</th>
+                                    <th>Harga Satuan</th>
+                                    <th>Total</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                            </thead>
+                            <tbody>
+                                @foreach ($kirim->detailPesanan as $detail)
+                                    <tr>
+                                        <td>{{ $detail->nama_produk }}</td>
+                                        <td>{{ $detail->qty }}</td>
+                                        <td>Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
+                                        <td>Rp {{ number_format($detail->qty * $detail->harga_satuan, 0, ',', '.') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <script>
-        function terimaPesanan(id_pengiriman) {
-            if (confirm('Anda yakin pesanan ini telah diterima?')) {
-                axios.post(`/admin/pengiriman/${id_pengiriman}/terima`)
-                    .then(response => {
-                        alert('Pesanan berhasil diterima.');
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        console.error(error);
-                        alert('Terjadi kesalahan saat memproses permintaan.');
-                    });
-            }
-        }
-    </script>
+    @endforeach
 
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

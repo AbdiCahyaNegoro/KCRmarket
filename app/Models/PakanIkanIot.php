@@ -12,6 +12,6 @@ class PakanIkanIot extends Model
     protected $table = 'pakanikaniot';
 
     protected $fillable = [
-        'waktu', 'TakaranPakan',
+        'waktu_pakan'
     ];
 }

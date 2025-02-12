@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\Route;
 //AKSES UMUM
 Route::get('/index', [App\Http\Controllers\Controller::class, 'tampildataproduk'])->name('tampildataproduk');
 Route::get('/', [App\Http\Controllers\ProdukController::class, 'tampildataproduk'])->name('tampildataproduk');
-Route::post('/suhuair/insertdata', [App\Http\Controllers\SuhuAirController::class, 'uploadDatadarialat']);
-
+Route::get('/sensor-suhu/{nilaisuhu}',[App\Http\Controllers\SuhuAirController::class,'simpandata']);
 
 
 //AKSES PENGGUNA
@@ -20,7 +19,7 @@ Route::middleware(CekLeveladmin::class)->group(function () {
     Route::put('/profile/update', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('profile.update');
     Route::get('/admin', [App\Http\Controllers\Controller::class, 'index'])->name('admin');
     Route::get('/beranda', [App\Http\Controllers\HomeController::class, 'BerandaAdmin'])->name('beranda');
-    Route::get('/pakanikan', [App\Http\Controllers\PakanIkanController::class, 'pakanikan'])->name('pakanikan');
+    Route::get('/pakanikan', [App\Http\Controllers\PakanIkanController::class, 'lihatpakanikan'])->name('pakanikan');
     Route::post('/pakanikan/kasihmakan', [App\Http\Controllers\PakanIkanController::class, 'kasihmakan'])->name('kasihmakan');
     Route::get('/suhuair', [App\Http\Controllers\SuhuAirController::class, 'suhuair'])->name('suhuair');
     Route::get('/pelanggan', [App\Http\Controllers\PelangganController::class, 'pelanggan'])->name('tampilpelanggan');
@@ -49,6 +48,11 @@ Route::middleware(CekLeveladmin::class)->group(function () {
     Route::post('/kirim/{id}', [App\Http\Controllers\PengirimanController::class, 'kirim'])->name('admin.kirimpesanan');
     Route::get('/sudahkirim', [App\Http\Controllers\PengirimanController::class, 'adminsudahkirim'])->name('admin.sudahkirim');
     Route::get('/sudahditerima', [App\Http\Controllers\PengirimanController::class, 'adminditerima'])->name('admin.sudahditerima');
+
+    Route::get('/lihat-pakanikan', [App\Http\Controllers\PakanIkanController::class, 'lihatpakanikan'])->name('lihat.pakanikan');
+    Route::get('/get-waktu-pakan', [App\Http\Controllers\PakanIkanController::class, 'getWaktuPakan'])->name('get.waktu.pakan');
+    Route::post('/update-waktu-pakan', [App\Http\Controllers\PakanIkanController::class, 'updateWaktuPakan'])->name('update.waktu.pakan');
+    
 });
 
 Route::middleware(CekLevelPelanggan::class)->group(function () {
@@ -73,8 +77,6 @@ Route::middleware(CekLevelPelanggan::class)->group(function () {
 
     Route::get('/dibatalkan', [App\Http\Controllers\PesananController::class, 'dibatalkan'])->name('tampildatadibatalkan');
 
-
     Route::get('/dikirim', [App\Http\Controllers\PengirimanController::class, 'Dikirim'])->name('tampildatadikirim');
-    Route::post('/dikirim/{id}/terima', [App\Http\Controllers\PengirimanController::class, 'terimaPengiriman'])
-        ->name('terimaPengiriman');
+    Route::post('/dikirim/{id}/terima', [App\Http\Controllers\PengirimanController::class, 'terimaPengiriman'])->name('terimaPengiriman');
 });

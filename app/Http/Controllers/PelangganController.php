@@ -17,6 +17,6 @@ class PelangganController extends Controller
     
     public function pelanggan(){
         $users = User::all(); // Mengambil semua data pengguna
-        return view('admin.pelanggan', compact('users'));
+        return view('admin.Pelanggan', compact('users'));
     }
 }

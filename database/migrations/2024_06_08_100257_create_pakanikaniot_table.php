@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('pakanikaniot', function (Blueprint $table) {
             $table->id();
-            $table->timestamp('waktu')->useCurrent();
-            $table->integer('TakaranPakan'); //1 10 gram , 2 20 gram , 3 30 gram , 4 40 gram , 5 50 gram
+            $table->integer('waktu_pakan')->default(10); 
+            $table->timestamps();
         });
     }
 

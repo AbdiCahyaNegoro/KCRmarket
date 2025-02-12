@@ -103,7 +103,7 @@ class PengirimanController extends Controller
                 ->get();
         });
 
-        return view('admin.dikirim', compact('pengirimanList'));
+        return view('admin.Dikirim', compact('pengirimanList'));
     }
 
 
@@ -117,24 +117,23 @@ class PengirimanController extends Controller
 
     public function Dikirim()
     {
-        // Ambil semua pengiriman dengan status 'Dikirim' atau 'Diterima' untuk pelanggan yang sedang login
-        $pengirimanList = Pengiriman::select('pengiriman.*', 'pesanan.id_user')
+        $userId = Auth::user()->id;
+        
+        // Ambil data pengiriman berdasarkan id_user
+        $pengirimanList = DB::table('pengiriman')
+            ->select('pengiriman.*', 'pesanan.id_pesanan', 'pesanan.tanggalpesanan', 'pesanan.totalpesanan')
             ->join('pesanan', 'pengiriman.id_pesanan', '=', 'pesanan.id_pesanan')
-            ->where(function ($query) {
-                $query->where('pengiriman.status', 'Dikirim')
-                    ->orWhere('pengiriman.status', 'Diterima');
-            })
-            ->where('pesanan.id_user', Auth::id())
+            ->where('pesanan.id_user', $userId)
             ->get();
-
-        // Ambil data detail pesanan dalam view
-        $pengirimanList->each(function ($pengiriman) {
+    
+        // Ambil detail pesanan untuk setiap pengiriman
+        foreach ($pengirimanList as $pengiriman) {
             $pengiriman->detailPesanan = DetailPesanan::select('detailpesanan.*', 'produk.nama_produk', 'produk.harga_satuan')
                 ->leftJoin('produk', 'detailpesanan.id_produk', '=', 'produk.id_produk')
                 ->where('detailpesanan.id_pesanan', $pengiriman->id_pesanan)
                 ->get();
-        });
-
+        }
+    
         return view('market.pesanandikirim', compact('pengirimanList'));
     }
 

@@ -59,6 +59,10 @@
                                 <option value="P" {{ old('jeniskelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="no_hp" class="form-label">{{ __('No HP') }}</label>
+                            <input id="no_hp" type="text" class="form-control @error('no_hp') is-invalid @enderror" name="no_hp" value="{{ old('no_hp') }}" required>
+                        </div>
 
                         <div class="mb-3">
                             <button type="submit" class="btn btn-primary">{{ __('Register') }}</button>

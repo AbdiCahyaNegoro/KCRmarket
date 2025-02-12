@@ -129,19 +129,6 @@ class PesananController extends Controller
     }
 
 
-
-    public function dikirim()
-    {
-        $userId = Auth::user()->id; // Mendapatkan user_id dari pengguna yang sedang masuk
-
-        $pengiriman = DB::table('pengiriman')
-            ->join('pesanan', 'pengiriman.id_pesanan', '=', 'pesanan.id_pesanan')
-            ->where('pesanan.id_user', $userId)
-            ->get();
-
-        return view('market.pesanandikirim', compact('pengiriman'));
-    }
-
     public function dibatalkan()
     {
         $userId = Auth::user()->id; // Mendapatkan user_id dari pengguna yang sedang masuk
@@ -196,18 +183,18 @@ class PesananController extends Controller
         $pembayaran = Pembayaran::findOrFail($id);
         $pembayaran->status = 'Pembayaran Sukses';
         $pembayaran->save();
-    
+
         // Simpan data pengiriman
         $pengirimanData = [
             'id_pesanan' => $pembayaran->id_pesanan,
-            'tanggal_pengiriman' => now(), 
+            'tanggal_pengiriman' => now(),
             'status' => 'Belum Dikirim',
-            'nama_foto_resi' => "", 
+            'nama_foto_resi' => "",
             'folder' => 'assets/img/resi',
         ];
-    
+
         Pengiriman::create($pengirimanData);
-    
+
         return redirect()->back()->with('success', 'Pembayaran Diterima.');
     }
 
