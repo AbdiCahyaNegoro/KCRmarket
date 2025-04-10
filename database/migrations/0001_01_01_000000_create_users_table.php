@@ -12,18 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->increments('id')->primary();
-            $table->string('name',100);
-            $table->string('email',100)->unique();
+            $table->id();
+            $table->string('name', 100);
+            $table->string('email', 100)->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password',255);
-            $table->enum('leveluser', ['1','2']);
-            $table->string('alamat',255);
+            $table->string('password', 255);
+            $table->enum('leveluser', ['1', '2']);
+            $table->string('alamat', 255);
             $table->date('tanggallahir');
-            $table->enum('jeniskelamin',['L','P']);
-            $table->string('no_hp',15);
-            $table->string('foto',50); // ini nama foto
-            $table->string('folder',50); // untuk menyimpan path folder foto nya
+            $table->enum('jeniskelamin', ['L', 'P']);
+            $table->string('no_hp', 15);
+            $table->string('foto', 50);
+            $table->string('folder', 50);
             $table->rememberToken();
             $table->timestamps();
         });

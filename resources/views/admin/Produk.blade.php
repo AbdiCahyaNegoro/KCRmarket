@@ -27,9 +27,8 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>Nama Produk</th>
-                                        <th>Harga Satuan</th>
-                                        <th>Stok</th>
-                                        <th>Jenis Produk</th>
+                                        <th>Harga</th>
+                                        <th>Brand Produk</th>
                                         <th>Deskripsi Produk</th>
                                         <th>Foto</th>
                                         <th></th>
@@ -40,9 +39,8 @@
                                         <tr>
                                             <td>{{ $item->id_produk }}</td>
                                             <td>{{ $item->nama_produk }}</td>
-                                            <td>{{ $item->harga_satuan }}</td>
-                                            <td>{{ $item->stok }}</td>
-                                            <td>{{ $item->jenis }}</td>
+                                            <td>{{ $item->harga }}</td>
+                                            <td>{{ $item->brand }}</td>
                                             <td>{{ $item->deskripsiproduk }}</td>
                                             <td>
                                                 <img src="{{ asset($item->folder . '/' . $item->nama_foto) }}"
@@ -87,14 +85,9 @@
                                     name="nama_produk" value="{{ $item->nama_produk }}" required>
                             </div>
                             <div class="form-group">
-                                <label for="harga_satuan{{ $item->id_produk }}">Harga Satuan:</label>
-                                <input type="number" class="form-control" id="harga_satuan{{ $item->id_produk }}"
-                                    name="harga_satuan" value="{{ $item->harga_satuan }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="stok{{ $item->id_produk }}">Stok:</label>
-                                <input type="number" class="form-control" id="stok{{ $item->id_produk }}" name="stok"
-                                    value="{{ $item->stok }}" required>
+                                <label for="harga{{ $item->id_produk }}">Harga:</label>
+                                <input type="number" class="form-control" id="harga{{ $item->id_produk }}"
+                                    name="harga" value="{{ $item->harga }}" required>
                             </div>
                             <div class="form-group">
                                 <label for="deskripsiproduk{{ $item->id_produk }}">Deskripsi Produk:</label>

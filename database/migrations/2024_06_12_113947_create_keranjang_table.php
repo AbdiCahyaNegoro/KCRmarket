@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+
 return new class extends Migration
 {
     /**
@@ -13,11 +14,13 @@ return new class extends Migration
     {
         Schema::create('keranjang', function (Blueprint $table) {
             $table->increments('id_keranjang');
-            $table->unsignedInteger('id_user');
-            $table->foreign('id_user')->references('id')->on('users');
+            $table->unsignedBigInteger('id_user');
+            $table->foreign('id_user')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedInteger('id_produk');
-            $table->foreign('id_produk')->references('id_produk')->on('produk');
+            $table->foreign('id_produk')->references('id_produk')->on('produk')->onDelete('cascade');
             $table->integer('quantity');
+            $table->string('brand');
+            $table->string('type');
         });
     }
 

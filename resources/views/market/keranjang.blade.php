@@ -3,100 +3,65 @@
 @section('title', 'Keranjang Belanja')
 
 @section('isimarket')
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Keranjang Belanja Kamu</h2>
 
-@if(session('success'))
-<div class="alert alert-success">
-    {{ session('success') }}
-</div>
-@elseif(session('error'))
-<div class="alert alert-error">
-    {{ session('error') }}
-</div>
-@endif
-
-<div class="fashion_section">
-        <div class="container">
-            <h1>KERANJANG BELANJA</h1><br><br>
-            @if ($keranjang->isEmpty())
-                <p>Keranjang belanja Anda kosong.</p>
-            @else
-                <form action="{{ route('keranjangkepesanan') }}" method="POST">
-                    @csrf
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" id="select-all"></th>
-                                <th>Produk</th>
-                                <th>Nama Produk</th>
-                                <th>Jumlah</th>
-                                <th>Harga Satuan</th>
-                                <th>Total</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($keranjang as $item)
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="item-checkbox" name="items[]"
-                                            value="{{ $item->id_keranjang }}" data-quantity="{{ $item->quantity }}"
-                                            data-price="{{ $item->harga_satuan }}">
-                                    </td>
-                                    <td><img src="{{ asset($item->folder . '/' . $item->nama_foto) }}"
-                                            alt="{{ $item->nama_produk }}" style="max-width: 100px;"></td>
-                                    <td>{{ $item->nama_produk }}</td>
-                                    <td>{{ $item->quantity }}</td>
-                                    <td>Rp. {{ number_format($item->harga_satuan, 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($item->quantity * $item->harga_satuan, 0, ',', '.') }}</td>
-                                    <td>
-                                    </form>
-                                        <form action="{{ route('hapusItemKeranjang', $item->id_keranjang) }}"
-                                            method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger"
-                                                style="font-size: 12px">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    <div>
-                        <p>Total Harga: Rp. <span id="totalHarga">0</span></p>
-                        <button type="submit" class="btn btn-primary">Pesan</button>
-                    </div>
-             
-            @endif
+    @if(session('success'))
+        <div class="bg-green-100 text-green-700 px-4 py-3 rounded mb-4">
+            {{ session('success') }}
         </div>
-    </div>
+    @elseif(session('error'))
+        <div class="bg-red-100 text-red-700 px-4 py-3 rounded mb-4">
+            {{ session('error') }}
+        </div>
+    @endif
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const checkboxes = document.querySelectorAll('.item-checkbox');
-            const totalHargaElement = document.getElementById('totalHarga');
-            const selectAllCheckbox = document.getElementById('select-all');
+    @if($keranjangItems->isEmpty())
+        <p class="text-gray-600">Keranjang kamu masih kosong.</p>
+    @else
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Produk</th>
+                        <th class="px-6 py-3 text-left">Brand</th>
+                        <th class="px-6 py-3 text-left">Type</th>
+                        <th class="px-6 py-3 text-left">Jumlah</th>
+                        <th class="px-6 py-3 text-left">Harga</th>
+                        <th class="px-6 py-3 text-left">Total</th>
+                        <th class="px-6 py-3 text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                    @foreach($keranjangItems as $item)
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4">{{ $item->produk->nama_produk }}</td>
+                            <td class="px-6 py-4">{{ $item->brand }}</td>
+                            <td class="px-6 py-4">{{ $item->type }}</td>
+                            <td class="px-6 py-4">{{ $item->quantity }}</td>
+                            <td class="px-6 py-4">Rp{{ number_format($item->produk->harga, 0, ',', '.') }}</td>
+                            <td class="px-6 py-4">Rp{{ number_format($item->produk->harga * $item->quantity, 0, ',', '.') }}</td>
+                            <td class="px-6 py-4">
+                                <form action="{{ route('keranjang.hapus', $item->id_keranjang) }}" method="POST" onsubmit="return confirm('Hapus item ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded">
+                                        Hapus
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateTotal);
-            });
-
-            selectAllCheckbox.addEventListener('change', function() {
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
-                updateTotal();
-            });
-
-            function updateTotal() {
-                let totalHarga = 0;
-                checkboxes.forEach(checkbox => {
-                    if (checkbox.checked) {
-                        totalHarga += checkbox.dataset.quantity * checkbox.dataset.price;
-                    }
-                });
-                totalHargaElement.textContent = new Intl.NumberFormat('id-ID').format(totalHarga);
-            }
-        });
-    </script>
+        <form action="{{ route('keranjang.checkout') }}" method="POST" class="mt-6 text-right">
+            @csrf
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-medium">
+                Lanjutkan Pesanan
+            </button>
+        </form>
+    @endif
+</div>
 @endsection

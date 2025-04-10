@@ -11,14 +11,20 @@ class DetailPesanan extends Model
 
     protected $table = 'detailpesanan';
     protected $primaryKey = 'id_detailpesanan';
-    
-    protected $fillable = [
-        'id_pesanan', 
-        'id_produk', 
-        'jumlah', 
-        'qty', 
-        'harga_satuan',
-    ];
-    
     public $timestamps = false;
+
+    protected $fillable = [
+        'id_pesanan', 'id_produk', 'brand', 'type', 'qty', 'harga'
+    ];
+
+    public function pesanan()
+    {
+        return $this->belongsTo(Pesanan::class, 'id_pesanan');
+    }
+
+    public function produk()
+    {
+        return $this->belongsTo(Produk::class, 'id_produk');
+    }
+
 }

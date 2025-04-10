@@ -13,11 +13,19 @@ return new class extends Migration
     {
         Schema::create('pesanan', function (Blueprint $table) {
             $table->increments('id_pesanan');
-            $table->unsignedInteger('id_user');
-            $table->foreign('id_user')->references('id')->on('users');
-            $table->enum('status',['Belum Bayar','Sudah Melakukan Pembayaran','Dibatalkan']);        
+            $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
+            $table->enum('status', [
+            'Belum Bayar', 
+            'Sudah Melakukan Pembayaran', 
+            'Menunggu Konfirmasi', 
+            'Proses Pengerjaan', 
+            'Selesai', 
+            'Dibatalkan'
+            ]);
             $table->date('tanggalpesanan');
-            $table->decimal('totalpesanan', 10, 2);    
+            $table->decimal('totalpesanan', 10, 2);
+            $table->string('brand');
+            $table->string('type');
         });
     }
 

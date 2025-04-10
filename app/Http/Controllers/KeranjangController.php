@@ -3,204 +3,127 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\produk;
+use App\Models\Produk;
 use App\Models\Keranjang;
-use App\Models\DetailPesanan;
 use App\Models\Pesanan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class KeranjangController extends Controller
 {
-
     public function __construct()
     {
-        // Menambahkan middleware ke dalam controller untuk mengotentikasi pengguna
+        // Middleware untuk memastikan pengguna sudah login
         $this->middleware('auth');
     }
 
-    public function index()
-    {
-        return view('index');
-    }
-
+    // Tambah item dari halaman detail produk
     public function TambahKeranjangDariDetail(Request $request)
     {
         $request->validate([
             'id_produk' => 'required|exists:produk,id_produk',
-            'jumlah' => 'required|integer|min:1',
+            'brand' => 'required|string',
+            'type' => 'required|string',
         ]);
 
-        // Dapatkan ID pengguna yang saat ini masuk
-        $userId = Auth::user()->id;
+        try {
+            $userId = Auth::id();
+            $productId = $request->input('id_produk');
+            $jumlah =1;
+            $brand = $request->input('brand');
+            $type = $request->input('type');
 
-        // Dapatkan ID produk dari request
-        $productId = $request->input('id_produk');
-        $jumlah = $request->input('jumlah');
+            $existing = DB::table('keranjang')
+                ->where('id_user', $userId)
+                ->where('id_produk', $productId)
+                ->where('brand', $brand)
+                ->where('type', $type)
+                ->first();
 
-        // Dapatkan produk berdasarkan ID
-        $produk = Produk::find($productId);
+            if ($existing) {
+                DB::table('keranjang')
+                    ->where('id_keranjang', $existing->id_keranjang)
+                    ->update(['quantity' => $existing->quantity + $jumlah]);
+            } else {
+                DB::table('keranjang')->insert([
+                    'id_user' => $userId,
+                    'id_produk' => $productId,
+                    'quantity' => 1 ,
+                    'brand' => $brand,
+                    'type' => $type,
+                ]);
+            }
 
-        // Periksa apakah stok mencukupi
-        if ($produk->stok < $request->jumlah) {
-            return redirect()->back()->with('error', 'Stok produk tidak mencukupi.');
+            return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang.');
+        } catch (\Exception $e) {
+            Log::error('Gagal tambah ke keranjang: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menambahkan produk ke keranjang.');
         }
-
-
-        // Cek apakah produk sudah ada di keranjang pengguna
-        $keranjang = Keranjang::where('id_user', $userId)
-            ->where('id_produk', $productId)
-            ->first();
-
-        if ($keranjang) {
-            // Jika produk sudah ada, tingkatkan jumlahnya
-            $keranjang->increment('quantity', $jumlah);
-        } else {
-            // Tambahkan produk yang dipesan ke tabel keranjang
-            DB::table('keranjang')->insert([
-                'id_user' => $userId,
-                'id_produk' => $productId,
-                'quantity' => $request->jumlah,
-            ]);
-        }
-        // Kurangi stok produk
-        $produk->stok -= $request->jumlah;
-        $produk->save();
-        // Redirect kembali ke halaman sebelumnya atau halaman keranjang belanja
-        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang. Cek Keranjang');
     }
 
-    public function TambahKeranjangLangsung(Request $request, $id_produk)
+    
+    // Tampilkan isi keranjang
+    public function tampilKeranjang()
     {
-        // Validasi request di sini jika diperlukan
-
-        // Dapatkan ID pengguna yang saat ini masuk
-        $userId = Auth::user()->id;
-
-        // Dapatkan produk berdasarkan ID
-        $produk = Produk::find($id_produk);
-
-        // Periksa apakah produk ditemukan
-        if (!$produk) {
-            return redirect()->back()->with('error', 'Produk tidak ditemukan.');
-        }
-
-        // Periksa apakah stok mencukupi
-        if ($produk->stok < 1) {
-            return redirect()->back()->with('error', 'Stok produk tidak mencukupi.');
-        }
-
-        // Cek apakah produk sudah ada di keranjang pengguna
-        $keranjang = Keranjang::where('id_user', $userId)
-            ->where('id_produk', $id_produk)
-            ->first();
-
-        if ($keranjang) {
-            // Jika produk sudah ada, tingkatkan jumlahnya
-            $keranjang->increment('quantity', 1);
-        } else {
-            // Jika produk belum ada, tambahkan ke keranjang
-            DB::table('keranjang')->insert([
-                'id_user' => $userId,
-                'id_produk' => $id_produk,
-                'quantity' => 1,
-            ]);
-        }
-
-        // Kurangi stok produk
-        $produk->stok -= 1;
-        $produk->save();
-
-        // Respon berhasil
-        return redirect()->route('index')->with('success', 'Produk berhasil ditambahkan ke keranjang.');
+        $keranjangItems = Keranjang::with('produk')->where('id_user', auth()->id())->get();
+        return view('market.keranjang', compact('keranjangItems'));
     }
-
-
-
-    public function tampilkeranjang()
-    {
-        // Ambil semua data produk dari database
-        $keranjang = Keranjang::leftJoin('produk', 'keranjang.id_produk', '=', 'produk.id_produk')
-            ->leftJoin('jenisproduk', 'produk.jenisproduk_id', '=', 'jenisproduk.id_jenisproduk')
-            ->select('keranjang.*', 'produk.*', 'jenisproduk.*') // Ambil semua kolom dari ketiga tabel
-            ->where('keranjang.id_user', auth()->id())
-            ->get();
-
-
-        // Kirim data ke view
-        return view('market.keranjang', compact('keranjang'));
-    }
-
 
     public function hapusItemKeranjang($id_keranjang)
-    {
-        // Temukan item keranjang berdasarkan ID
-        $itemKeranjang = Keranjang::find($id_keranjang);
+{
+    try {
+        $item = Keranjang::where('id_user', auth()->id())
+                         ->where('id_keranjang', $id_keranjang)
+                         ->firstOrFail();
 
-        // Periksa apakah item keranjang ditemukan
-        if ($itemKeranjang) {
-            // Kembalikan jumlah stok produk
-            $produk = Produk::find($itemKeranjang->id_produk);
-            $produk->stok += $itemKeranjang->quantity;
-            $produk->save();
+        $item->delete();
 
-            // Hapus item dari keranjang
-            $itemKeranjang->delete();
-
-            // Redirect kembali ke halaman keranjang dengan pesan sukses
-            return redirect()->route('keranjang')->with('success', 'Item berhasil dihapus dari keranjang.');
-        }
-
-        // Jika item tidak ditemukan, redirect kembali ke halaman keranjang dengan pesan error
-        return redirect()->route('keranjang')->with('error', 'Item tidak ditemukan dalam keranjang.');
+        return redirect()->route('keranjang')->with('success', 'Item berhasil dihapus dari keranjang.');
+    } catch (\Exception $e) {
+        return redirect()->route('keranjang')->with('error', 'Gagal menghapus item: ' . $e->getMessage());
+    }
     }
 
 
+    // Pindahkan item dari keranjang ke pesanan
+    public function pindahKePesanan(Request $request)
+{
+    $keranjang = Keranjang::where('id_user', Auth::id())->get();
 
-    public function keranjangkepesanan(Request $request)
-    {
-        // Dapatkan ID pengguna yang saat ini masuk
-        $userId = Auth::user()->id;
+    if ($keranjang->isEmpty()) {
+        return redirect()->back()->with('error', 'Keranjang kosong.');
+    }
 
-        // Ambil semua item di keranjang pengguna
-        $keranjangItems = DB::table('keranjang')
-            ->leftJoin('produk', 'keranjang.id_produk', '=', 'produk.id_produk')
-            ->select('keranjang.*', 'produk.harga_satuan')
-            ->where('keranjang.id_user', $userId)
-            ->get();
+    $total = 0;
 
-        // Jika keranjang kosong, langsung kembalikan
-        if ($keranjangItems->isEmpty()) {
-            return redirect()->route('keranjang')->with('error', 'Keranjang belanja Anda kosong.');
-        }
+    foreach ($keranjang as $item) {
+        $total += $item->produk->harga * $item->quantity;
+    }
 
-        // Hitung total harga pesanan
-        $totalHarga = $keranjangItems->sum(function ($item) {
-            return $item->quantity * $item->harga_satuan;
-        });
+    $pesanan = Pesanan::create([
+        'id_user' => Auth::id(),
+        'tanggalpesanan' => now(),
+        'totalpesanan' => $total,
+        'status' => 'Belum Bayar',
+        // Ambil brand dan type dari item pertama
+        'brand' => $keranjang->first()->brand,
+        'type' => $keranjang->first()->type,
+    ]);
 
-        // Buat pesanan baru
-        $pesanan = Pesanan::create([
-            'id_user' => $userId,
-            'status'=>'Belum Bayar',
-            'tanggalpesanan' => now(),
-            'totalpesanan' => $totalHarga,
+    foreach ($keranjang as $item) {
+        $pesanan->detailpesanan()->create([
+            'id_produk' => $item->id_produk,
+            'brand' => $item->brand,
+            'type' => $item->type,
+            'qty' => $item->quantity,
+            'harga' => $item->produk->harga,
         ]);
-
-        // Tambahkan detail pesanan untuk setiap item keranjang
-        foreach ($keranjangItems as $item) {
-            DetailPesanan::create([
-                'id_pesanan' => $pesanan->id_pesanan,
-                'id_produk' => $item->id_produk,
-                'qty' => $item->quantity,
-                'harga_satuan' => $item->harga_satuan,
-            ]);
-        }
-
-        // Hapus semua item dari keranjang
-        DB::table('keranjang')->where('id_user', $userId)->delete();
-
-        // Redirect ke halaman keranjang atau halaman lain yang diinginkan
-        return redirect()->route('keranjang')->with('success', 'Pesanan berhasil dibuat.Lakukan Pembayaran di PESANAN');
     }
+
+    Keranjang::where('id_user', Auth::id())->delete();
+
+    return redirect()->route('pesanan.belumbayar')->with('success', 'Checkout berhasil.');
+}
+
 }

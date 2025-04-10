@@ -11,49 +11,27 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    protected $table = 'users';
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'leveluser',
-        'alamat',
-        'tanggallahir',
-        'jeniskelamin',
-        'no_hp',
-        'foto',
-        'folder',
+        'name', 'email', 'password', 'leveluser', 'alamat',
+        'tanggallahir', 'jeniskelamin', 'no_hp', 'foto', 'folder',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function pesanan()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(Pesanan::class, 'id_user');
     }
-    
-    public function updateUserProfile(array $data)
+
+    public function pembayaran()
     {
-        return $this->update($data);
+        return $this->hasMany(Pembayaran::class, 'id_user');
+    }
+
+    public function keranjang()
+    {
+        return $this->hasMany(Keranjang::class, 'id_user');
     }
 }

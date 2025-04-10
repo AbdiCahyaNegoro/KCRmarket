@@ -36,35 +36,43 @@ class HomeController extends Controller
 
     public function BerandaAdmin()
     {
-        //Jumlah User Aktif
-        $totalUsers = DB::table('users')->count();
-
-
-        // Total Pendapatan Hari Ini
         $today = now()->format('Y-m-d');
+    
+        // Jumlah User Aktif
+        $totalUsers = DB::table('users')->count();
+    
+        // Total Pendapatan Hari Ini
         $totalPembayaranSuksesHariIni = DB::table('pesanan')
             ->join('pembayaran', 'pesanan.id_pesanan', '=', 'pembayaran.id_pesanan')
             ->whereDate('pembayaran.tanggal_pembayaran', $today)
             ->where('pembayaran.status', 'Pembayaran Sukses')
             ->where('pesanan.status', 'Sudah Melakukan Pembayaran')
             ->sum('pesanan.totalpesanan');
-
-
+    
         // Jumlah Pesanan Hari Ini
-        $jumlahpesananharini = DB::table('pesanan')
+        $jumlahPesananHariIni = DB::table('pesanan')
             ->whereDate('tanggalpesanan', $today)
             ->count();
-
-
-        //Jumlah Belum Dikirim
-
-        $jumlahbelumdikrim = DB::table('pengiriman')
-            ->where('status', 'Belum Dikirim')
+    
+        // Jumlah Pesanan Belum Dikerjakan
+        $jumlahBelumDikerjakan = DB::table('proses')
+            ->where('status', 'Sedang Dikerjakan')
             ->count();
-
-        return view('admin.Beranda', compact('totalPembayaranSuksesHariIni', 'totalUsers', 'jumlahpesananharini','jumlahbelumdikrim'));
+    
+        // Jumlah Pesanan Selesai
+        $jumlahPesananSelesai = DB::table('pesanan')
+            ->where('status', 'Selesai')
+            ->count();
+    
+        return view('admin.Beranda', compact(
+            'totalUsers',
+            'totalPembayaranSuksesHariIni',
+            'jumlahPesananHariIni',
+            'jumlahBelumDikerjakan',
+            'jumlahPesananSelesai'
+        ));
     }
-
+    
     public function Profile()
     {
         return view('Profile');

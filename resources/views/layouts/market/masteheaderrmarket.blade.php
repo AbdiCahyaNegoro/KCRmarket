@@ -7,116 +7,116 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SELAMAT DATANG::SELAMAT BERBELANJA')</title>
-    <!-- CSS DAN JS -->
-    <link href={{ asset('assets/vendor/fontawesome-free/css/all.min.css') }} rel="stylesheet" type="text/css">
-    <link rel="stylesheet" type="text/css" href={{ asset('assets/css/stylebelanja/bootstrap.min.css') }}>
-    <link rel="stylesheet" type="text/css" href={{ asset('assets/css/stylebelanja/costumstyle.css') }}>
-    <link rel="stylesheet" href={{ asset('assets/css/stylebelanja/responsive.css') }}>
-    <link rel="stylesheet" href={{ asset('assets/css/stylebelanja/jquery.mCustomScrollbar.min.css') }}>
-    <link rel="stylesheet" type="text/css" href={{ asset('assets/vendor/bootstrap/scss/_alert.scss') }}>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href={{ asset('assets/vendor/fontawesome-free/css/all.min.css') }} rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+
+
 </head>
 
-<body>
-    <!-- banner bg main start -->
-    <div class="banner_bg_main">
-        <!-- header top section start -->
-        <div class="container">
-            <div class="header_section_top">
-                <div class="row">
-                    <div class="col-sm-12 text-center">
-                        <div class="custom_menu">
-                            <ul>
-                                <span>
-                                    <li><a href="{{ route('index') }}"> <img src={{ asset('assets/img/logobrand.png') }}
-                                                width="200px"></li>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-gray-800 py-3 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4 md:px-6">
+            <a href="{{ route('index') }}" class="flex items-center space-x-2">
+                <img src="{{ asset('assets/img/logobrand.png') }}" width="70" class="rounded-md shadow-md">
+            </a>
+            <nav class="flex items-center space-x-6 text-white font-medium">
+                @guest
+                    <a href="{{ route('login') }}" class="hover:text-gray-300 transition">LOGIN</a>
+                    <a href="{{ route('register') }}" class="hover:text-gray-300 transition">REGISTER</a>
+                @endguest
+                @auth
+                    @if (Auth::user()->leveluser == 1)
+                        <a href="{{ route('beranda') }}" class="hover:text-gray-300 transition">DASHBOARD ADMIN</a>
+                    @endif
+                    @if (Auth::user()->leveluser == 2)
+                        <a href="{{ route('keranjang') }}"
+                            class="relative hover:text-gray-300 transition flex items-center">
+                            <i class="fas fa-shopping-cart mr-2 text-xl"></i> KERANJANG
+                            @if (isset($jumlahItemKeranjang) && $jumlahItemKeranjang > 0)
+                                <span
+                                    class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    {{ $jumlahItemKeranjang }}
                                 </span>
-                                {{-- Menu Tamu --}}
-                                @guest
-                                    <li><a href="{{ route('login') }}">LOGIN</a></li>
-                                    <li><a href="{{ route('register') }}">REGISTER</a></li>
-                                @endguest
-                                @auth
-                                    @if (Auth::user()->leveluser == 1)
-                                        <li><a href="{{ route('beranda') }}">DASHBOARD ADMIN</a></li>
-                                    @endif
-                                    @if (Auth::user()->leveluser == 2)
-                                        <li><a href="{{ route('keranjang') }}">
-                                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                                                <span class="padding_10">KERANJANG</span></a>
-                                        </li>
-                                        <li><a href="{{ route('tampilpesananbelumbayar') }}">
-                                                <span class="padding_10">PESANAN</span></a>
-                                        </li>
-                                    @endif
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-                                            role="button" data-toggle="dropdown" aria-haspopup="true"
-                                            aria-expanded="false">
-                                            {{ strtoupper(Auth::user()->name) }}
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                            <a class="dropdown-item" href="{{route('Profile')}}">PROFILE</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item"  href="{{ route('logout') }}"
-                                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">LOGOUT</a>
-                                            <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                                                style="display: none;">
-                                                @csrf
-                                            </form>
-                                        </div>
-                                </ul>
-                            @endauth
+                            @endif
+                        </a>
+                        <a href="{{ route('pesanan.belumbayar') }}"
+                            class="relative hover:text-gray-300 transition flex items-center">
+                            <i class="fas fa-receipt mr-2 text-xl"></i> PESANAN
+                            @if (isset($jumlahPesananBelumBayar) && $jumlahPesananBelumBayar > 0)
+                                <span
+                                    class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    {{ $jumlahPesananBelumBayar }}
+                                </span>
+                            @endif
+                        </a>
+                    @endif
+                    <div class="relative">
+                        <button
+                            class="text-white font-bold flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            id="dropdownButton">
+                            <span>{{ strtoupper(Auth::user()->name) }}</span>
+                            <i class="fas fa-caret-down"></i>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div id="dropdownMenu"
+                            class="absolute right-0 mt-3 w-48 bg-white text-black rounded-lg shadow-lg hidden">
+                            <a href="{{ route('Profile') }}" class="block px-4 py-2 hover:bg-gray-200">PROFILE</a>
+                            <form action="{{ route('logout') }}" method="POST" class="block">
+                                @csrf
+                                <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-200">LOGOUT</button>
+                            </form>
                         </div>
                     </div>
-                </div>
+                @endauth
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto py-8 px-6">
+        @yield('isimarket')
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 mt-8">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h2 class="text-lg font-semibold">Alamat Kami :</h2>
+                <p>Jl. Nuansa Baru,<br>Suka Mulya, Kec. Sematang Borang, Kota Palembang Sumatera Selatan 30961</p>
+                <p class="mt-2">Telepon: 081223123321</p>
+                <p>Email: @gmail.com</p>
+            </div>
+            <div>
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3984.5369106242106!2d104.81479537393191!3d-2.9483831396995543!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e3b77c7b99e04ef%3A0xf1b6c2b3135c1e29!2sJASA%20CUSTOM%20ROM%20%26%20ROOT%20-%20%40khoiril_cr!5e0!3m2!1sid!2sid!4v1743423017673!5m2!1sid!2sid"
+                    width="100%" height="250" frameborder="0" class="rounded-lg"></iframe>
             </div>
         </div>
+    </footer>
 
-        <main>
-            @yield('isimarket')
-        </main>
+    <div class="bg-gray-900 text-white text-center py-4">
+        <p>&copy; <?= date('Y') ?> Khoiril Costum Rom - Official</p>
+    </div>
 
-        <!-- banner bg main end -->
-        <footer>
-            <div class="footer_section layout_padding">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <b>Alamat Kami :</b><br>
-                            <b>Jl. Penuh Kenangan</b><br>
-                            <b>Kota Sukabumi, Negara Indonesia</b><br><br>
-                            <b>Telepon : 081223123321</b><br>
-                            <b>Email : fishfantasy@gmail.com</b>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="location_text">
-                                <iframe
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7921.551651140251!2d106.905092791291!3d-6.917383022328705!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e684829c6dffdd5%3A0xecbbf1784114f3d8!2sPoliteknik%20Sukabumi!5e0!3m2!1sen!2sid!4v1702558957634!5m2!1sen!2sid"
-                                    width="100%" height="250" frameborder="0"
-                                    style="border:3px; border-radius: 20px;" allowfullscreen></iframe>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
-        <!-- copyright section start -->
-        <div class="copyright_section">
-            <div class="container">
-                <p class="copyright_text">&copy; <?= date('Y') ?> ABDI CAHYA NEGORO - TEKNIK KOMPUTER POLITEKNIK
-                    SUKABUMI</p>
-            </div>
-        </div>
-        </footer>
+    <script>
+        // Get references to the button and the dropdown menu
+        const dropdownButton = document.getElementById('dropdownButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        // Toggle visibility of the dropdown menu when the button is clicked
+        dropdownButton.addEventListener('click', function(event) {
+            event.stopPropagation(); // Prevents the click event from propagating to the document
+            dropdownMenu.classList.toggle('hidden'); // Toggles visibility of the dropdown
+        });
+
+        // Close the dropdown if the user clicks anywhere outside of it
+        document.addEventListener('click', function(event) {
+            if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 
 </html>

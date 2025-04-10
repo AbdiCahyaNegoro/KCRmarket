@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>::FishFantasy::Admin</title>
+    <title>::KCR::Admin</title>
 
     <!-- Custom fonts for this template-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}">
@@ -19,6 +19,8 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Custom styles for this template-->
     <link rel="stylesheet" type="text/css" href={{ asset('assets/css/sb-admin-2.min.css') }} rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
@@ -27,196 +29,146 @@
     <!-- Page Wrapper -->
     <div id="wrapper">
 
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-samping sidebar sidebar-dark accordion" id="accordionSidebar">
-
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('beranda') }}">
-                <div class="sidebar-brand-icon">
-                    <img src="{{ asset('assets/img/logobrand.png') }}" alt="logobrand" width="200px">
-                </div>
+    <!-- Sidebar -->
+    <div class="flex flex-col h-screen w-64 fixed left-0 top-0 bg-gradient-to-b from-gray-900 to-gray-800 text-gray-200 shadow-lg z-10 overflow-y-auto transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out" id="sidebar">
+        <!-- Sidebar - Brand -->
+        <div class="flex items-center justify-center p-4 border-b border-gray-700">
+            <a href="{{ route('beranda') }}" class="flex items-center justify-center">
+                <img src="{{ asset('assets/img/logobrand.png') }}" alt="logobrand" class="w-48">
             </a>
+        </div>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('beranda') }}">
-                    <i class="fa fa-home" style="font-size: 16px"></i></i>
-                    <span style="font-size: 16px">Beranda</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading" style="font-size: 12px">
-                Kontrol ALAT IoT
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('pakanikan') }}">
-                    <i class="fa fa-water" style="font-size: 16px"></i>
-                    <span style="font-size: 16px">Pakan Ikan</span>
+        <!-- Navigation Items -->
+        <nav class="flex-1 overflow-y-auto">
+            <div class="space-y-1 px-2 py-4">
+                <!-- Dashboard -->
+                <a href="{{ route('beranda') }}" class="flex items-center px-4 py-2 text-base font-medium rounded-md hover:bg-white hover:text-blue-800">
+                    <i class="fa fa-home mr-3 text-lg"></i>
+                    <span>Beranda</span>
                 </a>
-            </li>
 
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('suhuair') }}">
-                    <i class="fa fa-thermometer-empty" style="font-size: 16px"></i>
-                    <span style="font-size: 16px">Suhu Air</span>
+                <div class="border-t border-blue-700 my-2"></div>
+
+                <!-- Market Section -->
+                <div class="px-4 pt-2 pb-1 text-xs font-medium uppercase tracking-wider text-gray-400">
+                    Market
+                </div>
+
+                <!-- Data Pelanggan -->
+                <a href="{{ route('tampilpelanggan') }}" class="flex items-center px-4 py-2 text-base font-medium rounded-md hover:bg-white hover:text-blue-800">
+                    <i class="fa fa-users mr-3 text-lg"></i>
+                    <span>Data Pelanggan</span>
                 </a>
-            </li>
-            
-            <!-- Divider -->
-            <hr class="sidebar-divider">
 
-            <!-- Heading -->
-            <div class="sidebar-heading" style="font-size: 12px">
-                Market
-            </div>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('tampilpelanggan') }}">
-                    <i class="fa fa-users" style="font-size: 16px"></i>
-                    <span style="font-size: 16px">Data Pelanggan</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('tampilproduk') }}" data-toggle="collapse"
-                    data-target="#produkSubMenu" aria-expanded="true" aria-controls="produkSubMenu">
-                    <i class="fas fa-book" style="font-size: 16px"></i>
-                    <span style="font-size: 16px">Produk</span>
-                </a>
-                <div id="produkSubMenu" class="collapse hide" aria-labelledby="produkSubMenu"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{ route('tampilproduk') }}">Data Produk</a>
-                        <a class="collapse-item" href="{{ route('admin.tambahproduk') }}">Tambah Produk</a>
-                        <a class="collapse-item" href="{{ route('admin.tambahjenis') }}">Tambah Jenis Ikan</a>
+                <!-- Produk Dropdown -->
+                <div x-data="{ open: false }" class="space-y-1">
+                    <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-base font-medium rounded-md hover:bg-white hover:text-blue-800">
+                        <div class="flex items-center">
+                            <i class="fas fa-book mr-3 text-lg"></i>
+                            <span>Produk</span>
+                        </div>
+                        <svg :class="{'transform rotate-180': open}" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="open" class="pl-4 space-y-1 bg-gray-700 rounded-md">
+                        <a href="{{ route('tampilproduk') }}" class="block px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-600 hover:text-white">Data Produk</a>
+                        <a href="{{ route('admin.tambahproduk') }}" class="block px-4 py-2 text-sm font-medium rounded-md hover:bg-white hover:text-blue-800">Tambah Produk Jasa</a>
+                        <a href="{{ route('admin.tambahjenis') }}" class="block px-4 py-2 text-sm font-medium rounded-md hover:bg-white hover:text-blue-800">Tambah Brand Dan Type</a>
                     </div>
                 </div>
-            </li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('tampilpesanan') }}" data-toggle="collapse" data-target="#pesanan"
-                    aria-expanded="true" aria-controls="pesananSubMenu">
-                    <i class="fas fa-list-alt" style="font-size: 16px"></i>
-                    <span style="font-size: 16px">Pesanan</span></a>
-                <div id="pesanan" class="collapse hide" aria-labelledby="pesanan" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{ route('tampilpesanan') }}">Konfirmasi Pesanan</a>
-                        <a class="collapse-item" href="{{ route('pesananditolak') }}">Pesanan Ditolak</a>
+                <!-- Pesanan Dropdown -->
+                <div x-data="{ open: false }" class="space-y-1">
+                    <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-base font-medium rounded-md hover:bg-white hover:text-blue-800">
+                        <div class="flex items-center">
+                            <i class="fas fa-list-alt mr-3 text-lg"></i>
+                            <span>Pesanan</span>
+                        </div>
+                        <svg :class="{'transform rotate-180': open}" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="open" class="pl-4 space-y-1 bg-gray-700 rounded-md">
+                        <a href="{{ route('semuapesanan') }}" class="block px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-600 hover:text-white">Semua Pesanan</a>
+                        <a href="{{ route('tampilpesanan') }}" class="block px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-600 hover:text-white">Konfirmasi Pembayaran</a>
+                        <a href="{{ route('pesananditolak') }}" class="block px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-600 hover:text-white">Pembayaran Ditolak</a>
                     </div>
+                </div>
 
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.belumkirim') }}" data-toggle="collapse"
-                    data-target="#pengiriman" aria-expanded="true" aria-controls="produkSubMenu">
-                    <i class="fas fa-paper-plane" style="font-size: 16px"></i>
-                    <span style="font-size: 16px">Pengiriman</span>
-                </a>
-                <div id="pengiriman" class="collapse hide" aria-labelledby="pengiriman"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{ route('admin.belumkirim') }}">Belum Dikirim</a>
-                        <a class="collapse-item" href="{{ route('admin.sudahkirim') }}">Sudah Dikirim</a>
-                        <a class="collapse-item" href="{{ route('admin.sudahditerima') }}">Diterima</a>
+                <!-- Take Job Dropdown -->
+                <div x-data="{ open: false }" class="space-y-1">
+                    <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-base font-medium rounded-md hover:bg-white hover:text-blue-800">
+                        <div class="flex items-center">
+                            <i class="fas fa-paper-plane mr-3 text-lg"></i>
+                            <span>Take Job</span>
+                        </div>
+                        <svg :class="{'transform rotate-180': open}" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="open" class="pl-4 space-y-1 bg-gray-700 rounded-md">
+                        <a href="{{ route('admin.takejob') }}" class="block px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-600 hover:text-white">Job</a>
+                        <a href="{{ route('admin.jobdone') }}" class="block px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-600 hover:text-white">Selesai</a>
                     </div>
-
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+                </div>
             </div>
+        </nav>
+    </div>
+    <!-- End of Sidebar -->
 
-
-
-        </ul>
-        <!-- End of Sidebar -->
-
-        <!-- Content Wrapper -->
+    <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
-            <!-- Main Content -->
-            <div id="content">
-
+            <!-- Main Content with scrollable area -->
+            <div class="flex flex-col md:ml-64 min-h-screen">
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
+                <nav class="flex items-center bg-white shadow px-4 py-2 h-16 fixed top-0 right-0 left-0 md:left-64 z-10">
+                    <!-- Mobile menu button -->
+                    <button id="mobileMenuButton" class="md:hidden text-gray-600 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
                     </button>
 
+                    <!-- User Profile (pushed to right) -->
+                    <div class="ml-auto flex items-center space-x-4" x-data="{ open: false }">
+                        <!-- User Dropdown -->
+                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                            <span class="hidden lg:inline text-gray-600 font-medium">
+                                {{ strtoupper(Auth::user()->name) }}
+                            </span>
+                            <img class="w-8 h-8 rounded-full" 
+                                 src="{{ asset(Auth::user()->folder .'/'.Auth::user()->foto) }}" 
+                                 alt="User profile">
+                        </button>
 
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-search fa-fw"></i>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                                aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small"
-                                            placeholder="Search for..." aria-label="Search"
-                                            aria-describedby="basic-addon2">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
-                                                <i class="fas fa-search fa-sm"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </li>
-
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span
-                                    class="mr-2 d-none d-lg-inline text-gray-600 small">{{ strtoupper(Auth::user()->name) }}</span>
-                                <img class="img-profile rounded-circle" src="{{ asset(Auth::user()->folder .'/'.Auth::user()->foto) }}">
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <a class="dropdown-item" data-toggle="modal" data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Keluar Beranda
-                                </a>
-                            </div>
-                        </li>
-
-                    </ul>
-
+                        <!-- Dropdown Menu -->
+                        <div x-show="open" @click.away="open = false" 
+                             class="absolute right-4 mt-10 w-48 bg-white rounded-md shadow-lg z-10">
+                            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                                @csrf
+                                <button type="submit" 
+                                        @click="$event.target.closest('[x-data]').__x.$data.loading = true"
+                                        class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>
+                                    LOGOUT
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </nav>
                 <!-- End of Topbar -->
-                @yield('content')
+                <!-- Scrollable content area with footer space -->
+                <div class="flex-1 overflow-y-auto mt-16 p-6 bg-gray-50 pb-20">
+                    @yield('content')
+                </div>
 
-
-                <!-- Footer -->
-                <footer class="sticky-footer bg-white">
-                    <div class="container my-auto">
-                        <div class="copyright text-center my-auto">
-                            <span>Copyright &copy; 2024 Aplikasi Penjualan Ikan Hias , Kontrol , Monitoring suhu dan
-                                pakan ikan</span>
+                <!-- Fixed footer -->
+                <footer class="fixed bottom-0 left-0 right-0 md:left-64 bg-white border-t border-gray-200 py-4 z-10">
+                    <div class="container mx-auto px-4">
+                        <div class="text-center text-gray-600">
+                            <span>Copyright &copy; <?= date('Y') ?> Khoiril Costum Rom - Official</span>
                         </div>
                     </div>
                 </footer>
@@ -233,25 +185,37 @@
             <i class="fas fa-angle-up"></i>
         </a>
 
-        <!-- Logout Modal-->
-        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Siap Untuk Keluar?</h5>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true"></span>
-                        </button>
-                    </div>
-                    <div class="modal-body">Yakin Ingin Keluar Dari Dashboard Admin .</div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
-                        <a class="btn btn-primary" href="{{ route('login') }}">Keluar</a>
-                    </div>
-                </div>
-            </div>
+        <!-- Loading Animation -->
+        <div x-data="{ loading: false }" 
+             x-show="loading"
+             x-init="loading = false"
+             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
         </div>
+
+        <script>
+            function showLoading() {
+                document.querySelector('[x-data]').__x.$data.loading = true;
+            }
+
+            // Mobile menu toggle
+            document.getElementById('mobileMenuButton').addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('translate-x-0');
+                sidebar.classList.toggle('-translate-x-full');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('sidebar');
+                const mobileBtn = document.getElementById('mobileMenuButton');
+                if (!sidebar.contains(event.target) && !mobileBtn.contains(event.target) && window.innerWidth < 768) {
+                    sidebar.classList.remove('translate-x-0');
+                    sidebar.classList.add('-translate-x-full');
+                }
+            });
+        </script>
+
 
 
 

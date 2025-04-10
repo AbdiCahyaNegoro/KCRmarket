@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             JenisprodukSeeder::class,
             ProdukSeeder::class,
-            PakanIkanSeeder::class,
            ]);
     }
 }

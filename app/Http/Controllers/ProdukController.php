@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\produk;
-use App\Models\jenisproduk;
+use App\Models\Produk;
+use App\Models\Brandproduk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -25,40 +25,31 @@ class ProdukController extends Controller
 
     public function detailproduk($idproduk)
     {
-        // Ambil Data Produk
-        $produk = Produk::where('produk.id_produk', $idproduk)
-            ->leftjoin('jenisproduk', 'produk.jenisproduk_id', '=', 'jenisproduk.id_jenisproduk')
-            ->first();
+        $produk = Produk::where('id_produk', $idproduk)->first();
+        $brandproduk = Brandproduk::all();
 
-        // Jika data produk ditemukan
-        if ($produk) {
-            // Kembalikan view dengan detail produk
-            return view('market.detailproduk', ['produk' => $produk]);
-        } else {
-            // Jika data produk tidak ditemukan, kembalikan halaman error atau tindakan yang sesuai
-            return redirect()->back()->with('error', 'Produk tidak ditemukan.');
-        }
+        return view('market.detailproduk', compact('produk', 'brandproduk'));
     }
 
     public function admintampildataproduk()
     {
-        // Ambil semua data produk dari database dengan left join ke tabel jenisproduk
-        $produk = Produk::leftJoin('jenisproduk', 'produk.jenisproduk_id', '=', 'jenisproduk.id_jenisproduk')
-            ->select('produk.*', 'jenisproduk.jenis')
+        // Ambil semua data produk dari database dengan left join ke tabel brandproduk
+        $produk = Produk::leftJoin('brandproduk', 'produk.id_brandproduk', '=', 'brandproduk.id_brandproduk')
+            ->select('produk.*', 'brandproduk.brand')
             ->get();
 
-        // Ambil semua data jenis ikan
-        $jenisproduk = JenisProduk::all();
+        // Ambil semua data brand
+        $brandproduk = BrandProduk::all();
 
         // Kirim data ke view
-        return view('admin.Produk', compact('produk', 'jenisproduk'));
+        return view('admin.Produk', compact('produk', 'brandproduk'));
     }
 
 
     public function formtambahproduk()
     {
-        $jenisproduk = JenisProduk::all();
-        return view('admin.TambahProduk', compact('jenisproduk'));
+        $brandproduk = BrandProduk::all();
+        return view('admin.TambahProduk', compact('brandproduk'));
     }
 
     public function admintambahproduk(Request $request)
@@ -66,9 +57,9 @@ class ProdukController extends Controller
         // Validasi input
         $request->validate([
             'nama_produk' => 'required|string|max:100',
-            'harga_satuan' => 'required|numeric',
-            'stok' => 'required|integer',
-            'jenisproduk_id' => 'required|integer',
+            'harga' => 'required|numeric',
+            'id_brandproduk' => 'required|array|min:1',
+            'id_brandproduk.*' => 'integer|exists:brandproduk,id_brandproduk',
             'deskripsiproduk' => 'required|string',
             'nama_foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -83,15 +74,17 @@ class ProdukController extends Controller
         // Pindahkan file ke direktori tujuan
         $file->move($destinationPath, $fotoName);
 
-        // Buat produk baru
-        Produk::create([
+        // Create single product with primary brand
+        $produk = Produk::create([
             'nama_produk' => $request->nama_produk,
-            'harga_satuan' => $request->harga_satuan,
-            'stok' => $request->stok,
-            'jenisproduk_id' => $request->jenisproduk_id,
+            'harga' => $request->harga,
+            'id_brandproduk' => $request->id_brandproduk[0], // Use first selected brand
             'deskripsiproduk' => $request->deskripsiproduk,
             'nama_foto' => $fotoName,
             'folder' => 'assets/img/produk',
+            'brand_tambahan' => count($request->id_brandproduk) > 1 
+                ? json_encode(array_slice($request->id_brandproduk, 1))
+                : null
         ]);
 
         // Redirect dan berikan pesan sukses
@@ -103,9 +96,8 @@ class ProdukController extends Controller
         // Validasi input
         $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'harga_satuan' => 'required|numeric',
-            'stok' => 'required|integer',
-            'jenisproduk_id' => 'required|exists:jenisproduk,id_jenisproduk',
+            'harga' => 'required|numeric',
+            'brandproduk_id' => 'required|exists:brandproduk,id_brandproduk',
             'deskripsiproduk' => 'required|string',
             'nama_foto' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Contoh validasi untuk file foto
         ]);
@@ -115,9 +107,8 @@ class ProdukController extends Controller
 
         // Update data produk
         $produk->nama_produk = $request->nama_produk;
-        $produk->harga_satuan = $request->harga_satuan;
-        $produk->stok = $request->stok;
-        $produk->jenisproduk_id = $request->jenisproduk_id;
+        $produk->harga = $request->harga;
+        $produk->brandproduk_id = $request->brandproduk_id;
         $produk->deskripsiproduk = $request->deskripsiproduk;
 
         // Cek apakah ada file foto baru yang diunggah
@@ -145,8 +136,7 @@ class ProdukController extends Controller
         // Validasi input
         $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'harga_satuan' => 'required|numeric',
-            'stok' => 'required|integer',
+            'harga' => 'required|numeric',
             'nama_foto' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi file foto
         ]);
 
@@ -159,8 +149,7 @@ class ProdukController extends Controller
             // Update data produk
             DB::table('produk')->where('id_produk', $id)->update([
                 'nama_produk' => $request->nama_produk,
-                'harga_satuan' => $request->harga_satuan,
-                'stok' => $request->stok,
+                'harga' => $request->harga,
                 'deskripsiproduk' => $request->deskripsiproduk,
             ]);
 
@@ -193,32 +182,33 @@ class ProdukController extends Controller
 
     public function formjenisproduk(Request $request)
     {
-        $jenisproduk = jenisproduk::all();
-        return view('admin.Jenisikan', compact('jenisproduk'));
+        $brandproduk = brandproduk::all();
+        return view('admin.Tambahbrand', compact('brandproduk'));
     }
 
     public function admintambahjenis(Request $request)
     {
         // Validasi input
         $request->validate([
-            'jenis' => 'required|string|max:100',
+            'brand' => 'required|string|max:100',
         ]);
 
-        // Simpan data jenis ikan baru
-        DB::table('jenisproduk')->insert([
-            'jenis' => $request->jenis,
+        // Simpan data brand ikan baru
+        DB::table('brandproduk')->insert([
+            'brand' => $request->brand,
+            'type' => $request->type,
         ]);
 
         // Redirect dengan pesan sukses
-        return redirect()->route('admin.simpanjenis')->with('success', 'Jenis ikan berhasil ditambahkan.');
+        return redirect()->route('admin.simpanjenis')->with('success', 'brand produk berhasil ditambahkan.');
     }
 
     public function hapusJenisProduk($id)
     {
         // Hapus jenis produk berdasarkan ID
-        DB::table('jenisproduk')->where('id_jenisproduk', $id)->delete();
+        DB::table('brandproduk')->where('id_brandproduk', $id)->delete();
 
         // Redirect dengan pesan sukses
-        return redirect()->route('admin.tambahjenis')->with('success', 'Jenis produk berhasil dihapus.');
+        return redirect()->route('admin.tambahjenis')->with('success', 'brand produk berhasil dihapus.');
     }
 }
