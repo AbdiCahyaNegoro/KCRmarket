@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'SELAMAT DATANG::SELAMAT BERBELANJA')</title>
+    <title>@yield('title', 'Costum Rom Terbaik Seindonesia:KCR')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href={{ asset('assets/vendor/fontawesome-free/css/all.min.css') }} rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -62,7 +62,7 @@
 
                         <!-- Dropdown Menu -->
                         <div id="dropdownMenu"
-                            class="absolute right-0 mt-3 w-48 bg-white text-black rounded-lg shadow-lg hidden">
+                            class="absolute right-0 mt-3 w-48 bg-white text-black rounded-lg shadow-lg hidden z-50">
                             <a href="{{ route('Profile') }}" class="block px-4 py-2 hover:bg-gray-200">PROFILE</a>
                             <form action="{{ route('logout') }}" method="POST" class="block">
                                 @csrf
@@ -83,8 +83,11 @@
         <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <h2 class="text-lg font-semibold">Alamat Kami :</h2>
-                <p>Jl. Nuansa Baru,<br>Suka Mulya, Kec. Sematang Borang, Kota Palembang Sumatera Selatan 30961</p>
-                <p class="mt-2">Telepon: 081223123321</p>
+                <p>Cabang 1</p>
+                <p>Jl. Nuansa Baru,<br>Suka Mulya, Kec. Sematang Borang, Kota Palembang Sumatera Selatan 30961</p><br>
+                <p>Cabang 2</p>
+                <p>Jl. Pelabuhan 2,<br>Desa Bojongraharja, Kec. Cikembar,Kab Sukabumi Jawa Barat</p><br>
+                <p class="mt-2">Handphone : 0815-9909-012</p>
                 <p>Email: @gmail.com</p>
             </div>
             <div>

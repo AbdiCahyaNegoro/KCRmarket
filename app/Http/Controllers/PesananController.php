@@ -60,6 +60,7 @@ class PesananController extends Controller
     $pesanan = Pesanan::with('pembayaran')
         ->where('id_user', $userId)
         ->whereIn('status', ['Belum Bayar', 'Menunggu Konfirmasi'])
+        ->orderByDesc('tanggalpesanan')
         ->get();
 
     $detailPesanan = DB::table('detailpesanan')
@@ -76,6 +77,7 @@ class PesananController extends Controller
     $proses = Proses::with(['pesanan.produk', 'user'])
         ->whereRelation('pesanan', 'id_user', Auth::id())
         ->whereIn('status', ['Menunggu Penanganan', 'Sedang Dikerjakan'])
+        ->orderByDesc('tanggal_proses')
         ->get();
 
     return view('market.proses', compact('proses'));
@@ -87,6 +89,7 @@ class PesananController extends Controller
         $selesai = Proses::with(['pesanan.produk'])
         ->whereRelation('pesanan', 'id_user', Auth::id())
         ->whereIn('status', ['selesai'])
+        ->orderByDesc('tanggal_proses')
         ->get();
 
         $selesai = Proses::with(['pesanan.detailPesanan.produk'])->get();

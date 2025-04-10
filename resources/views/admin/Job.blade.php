@@ -13,8 +13,12 @@
         @endif
 
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="bg-blue-100 px-4 py-3 border-b">
+            <div class="bg-blue-100 px-4 py-3 border-b flex justify-between items-center">
                 <h2 class="text-blue-800 font-semibold">Daftar Job Yang Tersedia</h2>
+                <a href="#"
+                    class="bg-red-900 hover:bg-pink-600 text-white px-4 py-2 rounded text-sm">
+                    Job Saya
+                </a>
             </div>
 
             <div class="p-4 overflow-x-auto">
@@ -38,15 +42,14 @@
                                 <td class="px-4 py-2 space-x-2">
                                     <!-- Detail Pesanan -->
                                     <button type="button"
-                                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
-                                            data-toggle="modal"
-                                            data-target="#detailPesanan{{ $proses->id_proses }}">
+                                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                                        data-toggle="modal" data-target="#detailPesanan{{ $proses->id_proses }}">
                                         Detail
                                     </button>
 
                                     <!-- Tombol Ambil -->
                                     <a href="{{ route('admin.takejobform', $proses->id_proses) }}"
-                                       class="px-3 py-1 rounded 
+                                        class="px-3 py-1 rounded 
                                        {{ $proses->status === 'Sedang Dikerjakan' ? 'bg-gray-300 cursor-not-allowed text-gray-600' : 'bg-green-500 hover:bg-green-600 text-white' }}
                                        {{ $proses->status === 'Sedang Dikerjakan' ? 'pointer-events-none' : '' }}">
                                         Ambil
@@ -54,10 +57,12 @@
 
                                     <!-- Tombol Selesai -->
                                     @if ($proses->status === 'Sedang Dikerjakan')
-                                        <form action="{{ route('admin.selesaikanJob', $proses->id_proses) }}" method="POST" class="inline">
+                                        <form action="{{ route('admin.selesaikanJob', $proses->id_proses) }}"
+                                            method="POST" class="inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
+                                            <button type="submit"
+                                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
                                                 Selesai
                                             </button>
                                         </form>
@@ -74,7 +79,7 @@
     {{-- Modal Detail --}}
     @foreach ($prosesList as $proses)
         <div class="modal fade" id="detailPesanan{{ $proses->id_proses }}" tabindex="-1" role="dialog"
-             aria-labelledby="modalLabel{{ $proses->id_proses }}" aria-hidden="true">
+            aria-labelledby="modalLabel{{ $proses->id_proses }}" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
